@@ -1,0 +1,102 @@
+<div class="list-courses mt-4">
+    <div class="text-center">
+        <span>
+        <a href="/me/courses/stored" style="float:left;">
+            <i class="fas fa-chevron-circle-left" style="font-size: 22px"></i>
+        </a>
+        <h3> List Deleted Courses </h3>
+        </span>
+    </div>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col" id="long">No.</th>
+            <th scope="col">Name</th>
+            <th scope="col">Level</th>
+            <th scope="col">Created At</th>
+            <th scope="col"colspan="2" >Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each courses}}
+        <tr>
+            <th scope="row">{{sum @index 1}}</th>
+                <td id="course-name-{{this._id}}">{{this.name}}</td>
+                <td>{{this.level}}</td>
+                <td>{{this.createdAt}}</td>
+                <td>
+                    <a class="btn btn-success btn-restore" data-id="{{this._id}}" >Restore</a>
+                    <a class="btn btn-danger ms-2" id="courses-delete-{{this._id}}" data-id="{{this._id}}" data-name="{{this.name}}" data-bs-toggle="modal" data-bs-target="#exampleModal"  href="#" role="button">Delete Forever</a>
+                </td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="5" class="text-center">
+                Thung rac trong  <a  href="/me/courses/stored">Danh sach khoa hoc</a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+</div>
+{{!-- confirm delete --}}
+        <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-confirm-delete">
+            
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id='btn-delete-course' type="button" class="btn btn-danger">Confirm Delete</button>
+        </div>
+        </div>
+    </div>
+</div>
+{{!-- Delete hidden form --}}
+<form name="delete-course-form" method="POST" action="" ></form>
+{{!--  --}}
+{{!-- Restore hidden form --}}
+<form name="restore-course-form" method="POST" action="" ></form>
+{{!--  --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var exampleModal = document.getElementById('exampleModal');
+        var courseId;
+        //get delete form element
+        var deleteForm = document.forms['delete-course-form'];
+        //get restore form element
+        var restoreForm = document.forms['restore-course-form'];
+        var restoreBtn = $('.btn-restore');
+        console.log(restoreBtn);
+
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+            courseId = button.getAttribute('data-id');
+            var courseName = button.getAttribute('data-name');
+            var textConfirmDelete = exampleModal.querySelector('.modal-body')
+            textConfirmDelete.innerHTML = 'ban muon xoa khoa hoc <b>' + courseName +'</b> nay a?';
+        });
+        
+        var btnDeleteCourseConfirm = document.getElementById('btn-delete-course');
+            btnDeleteCourseConfirm.onclick = function() {
+            deleteForm.action = '/courses/' + courseId +'/delete-force?_method=DELETE';
+            deleteForm.submit();
+        }
+
+    // restore
+        restoreBtn.click(function(event) {
+            event.preventDefault();
+            
+            let courseId = $(this).data('id');
+            console.log($(this).data('id'))
+            restoreForm.action = '/courses/' + courseId +'/restore?_method=PATCH';
+            restoreForm.submit();
+        });
+    })
+</script>

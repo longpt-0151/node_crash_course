@@ -48,6 +48,28 @@ class CourseController {
             .then(() => res.redirect('/me/courses/stored'))
             .catch(next)
     }
+
+    //[DELETE] /courses/:id/delete
+    delete = (req, res, next) => {
+        Course.delete({ _id: req.params.id})
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
+
+    //[DELETE] /courses/:id/delete-force
+    forceDelete = (req, res, next) => {
+        Course.deleteOne({ _id: req.params.id})
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
+
+    // [PATCH] /courses/:id/restore
+    restore = (req, res, next) => {
+        Course.restore({ _id: req.params.id})
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
+
 }
 
 module.exports = new CourseController();

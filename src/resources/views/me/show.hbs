@@ -1,8 +1,26 @@
-<div className="list-courses">
-<table class="table mt-4">
+<div class="list-courses mt-4">
+    <div class="text-center" >
+        <div class="wrapper"style="display : flex; justify-content: center">
+        <h3 >My Courses</h3>
+        {{#if countDeleted}}
+            <a 
+                href="/me/courses/trash" 
+                style="align-self: center; position: relative"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                title="check trash"
+            >
+                <i class="far fa-trash-alt trash-icon"></i>
+                <span class="badge bg-danger"  style="font-size:8px;">{{countDeleted}}</span>
+            </a>
+        {{/if}}
+        </div>
+        
+    </div>
+<table class="table">
     <thead>
         <tr>
-            <th scope="col">No.</th>
+            <th scope="col" id="long">No.</th>
             <th scope="col">Name</th>
             <th scope="col">Level</th>
             <th scope="col">Created At</th>
@@ -13,15 +31,68 @@
         {{#each courses}}
         <tr>
             <th scope="row">{{sum @index 1}}</th>
-                <td>{{this.name}}</td>
+                <td id="course-name-{{this._id}}">{{this.name}}</td>
                 <td>{{this.level}}</td>
                 <td>{{this.createdAt}}</td>
                 <td>
                     <a class="btn btn-primary" href="/courses/{{this._id}}/edit" role="button">Edit</a>
-                    <a class="btn btn-secondary" href="#" role="button">Delete</a>
+                    <a class="btn btn-secondary ms-2" id="courses-delete-{{this._id}}" data-id="{{this._id}}" data-name="{{this.name}}" data-bs-toggle="modal" data-bs-target="#exampleModal"  href="#" role="button">Delete</a>
                 </td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="5" class="text-center">
+                Ban chua dang khoa hoc nao  <a class="btn btn-primary ms-2" href="/courses/create">Dang khoa hoc</a>
+            </td>
         </tr>
         {{/each}}
     </tbody>
 </table>
 </div>
+{{!-- confirm delete --}}
+        <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-confirm-delete">
+            
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id='btn-delete-course' type="button" class="btn btn-danger">Confirm Delete</button>
+        </div>
+        </div>
+    </div>
+</div>
+{{!-- Delete hidden form --}}
+<form name="delete-course-form" method="POST" action="" ></form>
+{{!--  --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var exampleModal = document.getElementById('exampleModal');
+    var courseId;
+    var deleteForm = document.forms['delete-course-form'];
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget
+        courseId = button.getAttribute('data-id');
+        var courseName = button.getAttribute('data-name');
+        var textConfirmDelete = exampleModal.querySelector('.modal-body')
+        textConfirmDelete.innerHTML = 'ban muon xoa khoa hoc <b>' + courseName +'</b> nay a?';
+    });
+    var btnDeleteCourseConfirm = document.getElementById('btn-delete-course');
+    btnDeleteCourseConfirm.onclick = function() {
+        deleteForm.action = '/courses/' + courseId +'?_method=DELETE';
+        deleteForm.submit();
+    }
+
+    //tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+    })
+</script>
